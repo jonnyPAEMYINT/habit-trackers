@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="img/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="img/favicon/favicon.svg" />
+  <link rel="shortcut icon" href="img/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="img/favicon/apple-touch-icon.png" />
+  <link rel="manifest" href="img/favicon/site.webmanifest" />
+  <link rel="stylesheet" href="css/style.css" />
+  <meta name="apple-mobile-web-app-title" content="Trackers" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="text/javascript" src="js/main.js"></script>
+  <title>Habit Tracker</title>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Habit Tracker</h1>
+      <div id="darkToggle" class="dark-mode-toggle" onclick="toggleDarkMode()">💡</div>
+    </div>
+
+    <div class="card">
+      <h3>Create New Habit</h3>
+      <input id="habitName" placeholder="Habit name" />
+      <button onclick="addHabit()">Add</button>
+    </div>
+
+    <button onclick="toggleHabits()">Show/Hide Your Habits</button>
+
+    <div class="card" id="habitCard">
+      <h3>Your Habits</h3>
+      <div id="habitList"></div>
+    </div>
+
+    <div class="card">
+      <h3>Daily Tracking</h3>
+      <div style="display:flex; gap:5px; align-items:center;">
+        <select id="habitSelect" style="flex:1;"></select>
+        <button title="Record +1" onclick="recordHabit()">✅</button>
+        <button title="Reset Records" onclick="resetRecords()">🔄</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Report</h3>
+      <div id="reportGrid"></div>
+    </div>
+  </div>
+  <</body>
+</html>
