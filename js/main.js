@@ -31,58 +31,61 @@ function recordHabit() {
 }
 
 function renderHabits() {
-    const list = document.getElementById("habitList");
-    const select = document.getElementById("habitSelect");
+  const list = document.getElementById("habitList");
+  const select = document.getElementById("habitSelect");
+  list.innerHTML = "";
+  select.innerHTML = "";
 
-    if (list === null || select === null) return;
+  Object.keys(habits).forEach(h => {
+    // Habit list in "Show/Hide Your Habits"
+    const div = document.createElement("div");
+    div.className = "habit-item";
 
-    list.innerHTML = "";
-    select.innerHTML = "";
-
-    Object.keys(habits).forEach(h => {
-        const div = document.createElement("div");
-        div.className = "habit-item";
-
-        div.innerHTML = `
+    div.innerHTML = `
       <span id="habit-${h}">${h}</span>
       <div>
         <button title="Rename" onclick="toggleRename('${h}')">✏️</button>
         <button title="Delete" onclick="deleteHabit('${h}')">🗑️</button>
       </div>
     `;
-        list.appendChild(div);
+    list.appendChild(div);
 
-        const option = document.createElement("option");
-        option.value = h;
-        option.textContent = h;
-        select.appendChild(option);
-    });
+    // Dropdown in "Daily Tracking"
+    const option = document.createElement("option");
+    option.value = h;
+    option.textContent = h;
+    select.appendChild(option);
+  });
 
-    renderChart();
+  // Keep habits section visible even after reload
+  const card = document.getElementById("habitCard");
+  card.style.display = Object.keys(habits).length ? "block" : "none";
+
+  renderChart();
 }
 
 function toggleRename(oldName) {
-    const span = document.getElementById(`habit-${oldName}`);
-    if (span.tagName.toLowerCase() === "input") {
-        const newName = span.value.trim();
-        if (!newName || newName === oldName) {
-            renderHabits();
-            return;
-        }
-        habits[newName] = habits[oldName];
-        delete habits[oldName];
-        save();
-        renderHabits();
-    } else {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.value = oldName;
-        input.style.width = "70%";
-        input.id = `habit-${oldName}`;
-        span.replaceWith(input);
-        input.focus();
-        input.select();
+  const span = document.getElementById(`habit-${oldName}`);
+  if (span.tagName.toLowerCase() === "input") {
+    const newName = span.value.trim();
+    if (!newName || newName === oldName) {
+      renderHabits();
+      return;
     }
+    habits[newName] = habits[oldName];
+    delete habits[oldName];
+    save();
+    renderHabits();
+  } else {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = oldName;
+    input.style.width = "70%";
+    input.id = `habit-${oldName}`;
+    span.replaceWith(input);
+    input.focus();
+    input.select();
+  }
 }
 
 function renderChart() {
@@ -154,7 +157,7 @@ function resetRecords() {
     //if (!confirm("Are you sure you want to clear all records? This cannot be undone.")) return;
 
     Object.keys(habits).forEach(habit => {
-        habits[habit] = {};
+        habits[habit] = {}; // Clear all records but keep the habit
     });
 
     save();
@@ -172,4 +175,13 @@ function toggleHabits() {
     card.style.display = card.style.display === "none" ? "block" : "none";
 }
 
-renderHabits();
+document.addEventListener("DOMContentLoaded", function() {
+    renderHabits();
+});
+
+document.getElementById("habitName").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        addHabit();
+    }
+});
