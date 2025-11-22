@@ -177,11 +177,12 @@ function toggleHabits() {
 
 document.addEventListener("DOMContentLoaded", function() {
     renderHabits();
+
+    document.getElementById("habitName").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            addHabit();
+        }
+    });
 });
 
-document.getElementById("habitName").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        addHabit();
-    }
-});
