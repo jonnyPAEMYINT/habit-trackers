@@ -23,11 +23,17 @@
 
     <div class="card">
       <h3>Create New Habit</h3>
-      <input id="habitName" placeholder="Habit name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <button onclick="addHabit()">Add</button>
+      <div style="display:flex; gap:5px; align-items:center;">
+        <input id="habitName" placeholder="Habit name"
+               autocomplete="new-password" autocorrect="off"
+               autocapitalize="off" spellcheck="false"
+               style="flex:1;" />
+        
+        <button onclick="preventDoubleTap(this, addHabit)" class="icon-add">➕</button>
+      </div>
     </div>
 
-    <button onclick="toggleHabits()">Show/Hide Your Habits</button>
+    <button id="toggleHabitsBtn" onclick="preventDoubleTap(this, toggleHabits)">Hide Your Habits</button>
 
     <div class="card" id="habitCard">
       <h3>Your Habits</h3>
@@ -38,8 +44,8 @@
       <h3>Daily Tracking</h3>
       <div style="display:flex; gap:5px; align-items:center;">
         <select id="habitSelect" style="flex:1;"></select>
-        <button title="Record +1" onclick="recordHabit()">✅</button>
-        <button title="Reset Records" onclick="resetRecords()">🔄</button>
+        <button title="Record +1" onclick="preventDoubleTap(this, recordHabit)">✅</button>
+        <button title="Reset Records" onclick="preventDoubleTap(this, resetRecords)">🔄</button>
       </div>
     </div>
 
