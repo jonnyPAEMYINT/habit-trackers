@@ -105,6 +105,22 @@ input, select {
   text-align: center;
   line-height: 40px;
 }
+.icon-add {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 46px;
+  font-size: 1.2em;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  line-height: 46px;
+  border-radius: 8px;
+  background-color: var(--btn-bg);
+  color: var(--btn-color);
+}
+.icon-add:hover {
+  background-color: var(--btn-hover);
+}
 .habit-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr); /* 7 days */
@@ -112,24 +128,27 @@ input, select {
   margin-top: 5px;
   margin-bottom: 15px;
 }
-
 .habit-cell {
   width: 100%;
-  padding-top: 100%; /* square aspect ratio */
+  padding-top: 100%;       /* square aspect ratio */
   position: relative;
   border-radius: 5px;
+  background: #000;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
 }
-
 .habit-cell span {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 0.8em;
-  color: #fff;
-  font-weight: bold;
+  font-size: 20px;
+  color: white;
 }
-
+.habit-cell.done {
+  background: #007BFF;
+}
 .habit-name {
   font-weight: bold;
   margin-bottom: 3px;
