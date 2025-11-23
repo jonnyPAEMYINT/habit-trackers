@@ -1,5 +1,18 @@
 
 let habits = JSON.parse(localStorage.getItem("habits") || "{}");
+let lastTouchEnd = 0;
+
+document.addEventListener(
+  "touchend",
+  function (event) {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) {
+      event.preventDefault();  // cancel iOS double-tap zoom
+    }
+    lastTouchEnd = now;
+  },
+  { passive: false }
+);
 
 function save() {
     localStorage.setItem("habits", JSON.stringify(habits));
@@ -44,8 +57,8 @@ function renderHabits() {
     div.innerHTML = `
       <span id="habit-${h}">${h}</span>
       <div>
-        <button title="Rename" onclick="toggleRename('${h}')">✏️</button>
-        <button title="Delete" onclick="deleteHabit('${h}')">🗑️</button>
+        <button title="Rename" onclick="preventDoubleTap(this, () => toggleRename('${h}'))">✏️</button>
+        <button title="Delete" onclick="preventDoubleTap(this, () => deleteHabit('${h}'))">🗑️</button>
       </div>
     `;
     list.appendChild(div);
@@ -90,7 +103,7 @@ function toggleRename(oldName) {
 
 function renderChart() {
     const container = document.getElementById("reportGrid");
-    container.innerHTML = ""; // clear old content
+    container.innerHTML = "";
 
     const habitNames = Object.keys(habits);
     if (!habitNames.length) {
@@ -98,15 +111,15 @@ function renderChart() {
         return;
     }
 
-    // Get the last 7 days starting from Monday
+    // Get this week's Monday → Sunday
     const weekDays = [];
     const today = new Date();
     for (let i = 0; i < 7; i++) {
         const d = new Date();
-        // Set date to Monday of this week + i days
-        const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday...
-        const diffToMonday = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek); // how many days to go back to Monday
+        const dayOfWeek = today.getDay();
+        const diffToMonday = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek);
         d.setDate(today.getDate() + diffToMonday + i);
+
         weekDays.push({
             date: d.toISOString().split("T")[0],
             label: ['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]
@@ -116,25 +129,41 @@ function renderChart() {
     habitNames.forEach(habit => {
         const habitRow = document.createElement("div");
 
-        // Habit name
+        // Habit name label
         const habitLabel = document.createElement("div");
         habitLabel.className = "habit-name";
         habitLabel.textContent = habit;
         habitRow.appendChild(habitLabel);
 
-        // 7-day grid
+        // Day grid
         const grid = document.createElement("div");
         grid.className = "habit-grid";
 
         weekDays.forEach(day => {
+            const done = habits[habit][day.date] ? true : false;
             const cell = document.createElement("div");
             cell.className = "habit-cell";
-            const done = habits[habit][day.date] ? true : false;
-            cell.style.backgroundColor = done ? "#007BFF" : "#000000";
+            if (done) cell.classList.add("done");  // blue background if done
 
+            // child span for tick
             const span = document.createElement("span");
-            span.textContent = done ? "✓" : "";
+            span.textContent = done ? "✓" : "";    // tick
             cell.appendChild(span);
+
+            // toggle on click
+            cell.addEventListener("click", () => {
+              const today = day.date;
+              if (habits[habit][today]) {
+                delete habits[habit][today];  // reset
+                cell.classList.remove("done");
+                span.textContent = "";
+              } else {
+                habits[habit][today] = 1;     // mark done
+                cell.classList.add("done");
+                span.textContent = "✓";
+              }
+              save();
+            });
             grid.appendChild(cell);
         });
 
@@ -142,14 +171,16 @@ function renderChart() {
         container.appendChild(habitRow);
     });
 
-    // Add day labels under grid
+    // Day labels
     const dayLabelRow = document.createElement("div");
     dayLabelRow.className = "day-labels";
+
     weekDays.forEach(day => {
         const lbl = document.createElement("div");
         lbl.textContent = day.label;
         dayLabelRow.appendChild(lbl);
     });
+
     container.appendChild(dayLabelRow);
 }
 
@@ -172,7 +203,25 @@ function toggleDarkMode() {
 
 function toggleHabits() {
     const card = document.getElementById("habitCard");
-    card.style.display = card.style.display === "none" ? "block" : "none";
+    const btn = document.getElementById("toggleHabitsBtn");
+
+    // toggle visibility
+    const isHidden = card.style.display === "none";
+
+    card.style.display = isHidden ? "block" : "none";
+
+    // update button label
+    btn.textContent = isHidden ? "Hide Your Habits" : "Show Your Habits";
+}
+
+function preventDoubleTap(btn, callback) {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    callback();
+
+    setTimeout(() => {
+        btn.disabled = false;
+    }, 400); // 400ms is the sweet spot for iOS
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -185,4 +234,5 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
 
