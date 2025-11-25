@@ -114,6 +114,8 @@ function renderChart() {
     // Get this week's Monday → Sunday
     const weekDays = [];
     const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+
     for (let i = 0; i < 7; i++) {
         const d = new Date();
         const dayOfWeek = today.getDay();
@@ -122,48 +124,54 @@ function renderChart() {
 
         weekDays.push({
             date: d.toISOString().split("T")[0],
-            label: ['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]
+            label: ['M', 'T', 'W', 'T', 'F', 'S', 'S'][i],
+            isFuture: d > today   // <-- future-day check
         });
     }
 
     habitNames.forEach(habit => {
         const habitRow = document.createElement("div");
 
-        // Habit name label
         const habitLabel = document.createElement("div");
         habitLabel.className = "habit-name";
         habitLabel.textContent = habit;
         habitRow.appendChild(habitLabel);
 
-        // Day grid
         const grid = document.createElement("div");
         grid.className = "habit-grid";
 
         weekDays.forEach(day => {
             const done = habits[habit][day.date] ? true : false;
+
             const cell = document.createElement("div");
             cell.className = "habit-cell";
-            if (done) cell.classList.add("done");  // blue background if done
 
-            // child span for tick
+            // style done cells
+            if (done) cell.classList.add("done");
+
             const span = document.createElement("span");
-            span.textContent = done ? "✓" : "";    // tick
+            span.textContent = done ? "✓" : "";
             cell.appendChild(span);
 
-            // toggle on click
-            cell.addEventListener("click", () => {
-              const today = day.date;
-              if (habits[habit][today]) {
-                delete habits[habit][today];  // reset
-                cell.classList.remove("done");
-                span.textContent = "";
-              } else {
-                habits[habit][today] = 1;     // mark done
-                cell.classList.add("done");
-                span.textContent = "✓";
-              }
-              save();
-            });
+            if (day.isFuture) {
+                cell.style.opacity = "0.3";
+                cell.style.pointerEvents = "none";
+                 span.textContent = "🔒";
+            } else {
+                cell.addEventListener("click", () => {
+                    if (habits[habit][day.date]) {
+                        delete habits[habit][day.date];
+                        cell.classList.remove("done");
+                        span.textContent = "";
+                    } else {
+                        habits[habit][day.date] = 1;
+                        cell.classList.add("done");
+                        span.textContent = "✓";
+                    }
+                    save();
+                });
+            }
+
             grid.appendChild(cell);
         });
 
@@ -171,7 +179,6 @@ function renderChart() {
         container.appendChild(habitRow);
     });
 
-    // Day labels
     const dayLabelRow = document.createElement("div");
     dayLabelRow.className = "day-labels";
 
